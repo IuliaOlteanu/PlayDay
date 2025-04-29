@@ -2,8 +2,8 @@ import React from 'react';
 
 const AboutPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-start py-12 px-6">
-      <div className="max-w-4xl w-full bg-white p-8 rounded-lg shadow-md">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-start py-12 px-6">
+      <div className="max-w-4xl w-full bg-white p-8 rounded-xl shadow-lg drop-shadow-lg">
         <h1 className="text-3xl font-bold text-center text-[#065C64] mb-6">About Us</h1>
         
         <p className="text-gray-700 text-lg mb-6">

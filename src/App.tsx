@@ -8,11 +8,12 @@ import { AuthProvider } from './components/context/auth-provider';
 import Header  from './components/Header';
 import InProgressPage from './pages/InProgressPage';
 import MyProfilePage from './pages/MyProfilePage';
+import GamesPage from './pages/GamesPage';
 
 function App() {
 
   return (
-    <div className="App">
+    <div className="h-screen">
       <BrowserRouter>
         <AuthProvider>
           <Header />
@@ -36,6 +37,7 @@ function App() {
             <Route path="/my-profile" element={<MyProfilePage />} />
 
             {/* My Games Page */}
+            <Route path="/games" element={<GamesPage />} />
 
             {/* Fallback for unmatched routes */}
             <Route path="*" element={<InProgressPage />} />
