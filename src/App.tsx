@@ -9,6 +9,7 @@ import Header  from './components/Header';
 import InProgressPage from './pages/InProgressPage';
 import MyProfilePage from './pages/MyProfilePage';
 import GamesPage from './pages/GamesPage';
+import { FieldsPage } from './pages/FieldsPage';
 
 function App() {
 
@@ -26,6 +27,9 @@ function App() {
 
             {/* About Page */}
             <Route path="/about" element={<AboutPage />} />
+
+            {/* Fields Page */}
+            <Route path="/fields" element={<FieldsPage />} />
 
             {/* Sign In Page */}
             <Route path="/signIn" element={<SignIn />} />
