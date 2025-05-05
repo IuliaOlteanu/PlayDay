@@ -10,6 +10,7 @@ import InProgressPage from './pages/InProgressPage';
 import MyProfilePage from './pages/MyProfilePage';
 import GamesPage from './pages/GamesPage';
 import { FieldsPage } from './pages/FieldsPage';
+import MyFields from './pages/MyFields';
 
 function App() {
 
@@ -42,6 +43,9 @@ function App() {
 
             {/* My Games Page */}
             <Route path="/games" element={<GamesPage />} />
+
+            {/* My Fields Page */}
+            <Route path="/my-fields" element={<MyFields />} />
 
             {/* Fallback for unmatched routes */}
             <Route path="*" element={<InProgressPage />} />
