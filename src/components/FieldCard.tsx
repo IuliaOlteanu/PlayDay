@@ -22,7 +22,6 @@ const FieldCard: React.FC<FieldCardProps> = ({
   price,
   description,
   image,
-  owner,
   onFieldUpdated,
 }) => {
   const [isEditing, setIsEditing] = useState(false);

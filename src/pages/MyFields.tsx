@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import FieldCard from "@/components/FieldCard";
 import { FieldCardProps } from "@/components/FieldCard";
 import { collection, doc, setDoc, getDoc, query, where, onSnapshot } from "firebase/firestore";
@@ -7,6 +7,10 @@ import { v4 as uuidv4 } from "uuid"; // To generate unique IDs
 import { AuthContext } from "@/components/context/auth-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/hooks/use-toast";
+import LocationMarker from "@/components/LocationMarker";
+import { TileLayer } from "react-leaflet/TileLayer";
+import { MapContainer } from "react-leaflet/MapContainer";
+import { LatLng } from "leaflet";
 
 function MyFields() {
   const [fields, setUserFields] = useState<FieldCardProps[]>([]);
@@ -21,6 +25,9 @@ function MyFields() {
   const { toast } = useToast();
   const { user } = useContext(AuthContext);
 
+  const locationRef = useRef<any>();
+  const [position, setPosition] = useState<LatLng | null>(null);
+
   useEffect(() => {
     if (user) {
       // Fetch the username from the 'users' collection
@@ -28,7 +35,7 @@ function MyFields() {
         try {
           const userDocRef = doc(firestore, "users", user.uid);
           const userDoc = await getDoc(userDocRef);
-  
+
           if (userDoc.exists()) {
             const userData = userDoc.data();
             setUsername(userData.name || "User"); // Assuming 'name' is the field storing the username
@@ -39,13 +46,13 @@ function MyFields() {
           console.error("Error fetching username:", error);
         }
       };
-  
+
       fetchUsername();
-  
+
       // Real-time listener for fields
       const fieldsRef = collection(firestore, "fields");
       const q = query(fieldsRef, where("owner", "==", user.uid));
-  
+
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const userFields = querySnapshot.docs.map((doc) => ({
           id: doc.id,
@@ -53,7 +60,7 @@ function MyFields() {
         }));
         setUserFields(userFields);
       });
-  
+
       return () => unsubscribe(); // Cleanup listener on unmount
     }
   }, [user]);
@@ -90,6 +97,8 @@ function MyFields() {
         id: uniqueID, // Store the unique ID with the field data
         owner: user?.uid, // Store the ID of the user who added the field
         createdAt: new Date(),
+        lat: position?.lat,
+        lng: position?.lng,
       });
 
       toast({
@@ -116,7 +125,7 @@ function MyFields() {
 
   return (
     <div className="flex">
-        <Toaster />
+      <Toaster />
       {/* Sidebar */}
       <div className="w-1/5 p-8" style={{ backgroundColor: "#f8fafc", height: "100vh", overflowY: "auto" }}>
         <div className="flex flex-col items-center">
@@ -130,7 +139,7 @@ function MyFields() {
             fontSize: "20px",
             fontWeight: "bold",
             paddingTop: "20px"
-           }}>{username || "My Account"}</h3>
+          }}>{username || "My Account"}</h3>
         </div>
 
         {/* Buttons */}
@@ -170,10 +179,10 @@ function MyFields() {
         {/* Field Cards */}
         <div className="flex flex-col gap-4 overflow-y"
         >
-        <div className="grid grid-cols-4 gap-5 w-full"
-        >
+          <div className="grid grid-cols-4 gap-5 w-full"
+          >
             {fields.map((field) => (
-            <FieldCard
+              <FieldCard
                 key={field.id}
                 id={field.id}
                 fieldName={field.fieldName}
@@ -181,10 +190,10 @@ function MyFields() {
                 price={field.price}
                 owner={field.owner}
                 description={field.description}
-                // onDelete={() => handleDeleteField(field.id)}
-            />
+              // onDelete={() => handleDeleteField(field.id)}
+              />
             ))}
-        </div>
+          </div>
 
         </div>
       </div>
@@ -208,6 +217,19 @@ function MyFields() {
                 X
               </button>
             </div>
+            <MapContainer id="map-bro"
+              className="w-full h-[200px] mt-2"
+              center={{ lat: 51.505, lng: -0.09 }}
+              zoom={13}
+              scrollWheelZoom>
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <LocationMarker position={position} setPosition={setPosition} onClick={() => {
+                setFieldData({ ...fieldData, location: position?.toString() || "" });
+              }}/>
+            </MapContainer>
             <form onSubmit={handleSaveField} className="mt-4 text-left font-bold">
               {/* Field Name */}
               <div className="mb-4">
@@ -232,6 +254,7 @@ function MyFields() {
               <div className="mb-4">
                 <label>Location:</label>
                 <input
+                  disabled
                   type="text"
                   name="location"
                   value={fieldData.location}
@@ -244,6 +267,7 @@ function MyFields() {
                     border: "1px solid #ccc",
                     borderRadius: "5px",
                   }}
+                  ref={locationRef}
                 />
               </div>
 

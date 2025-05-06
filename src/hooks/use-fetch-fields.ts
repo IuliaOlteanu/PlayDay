@@ -10,6 +10,8 @@ export interface FieldData {
     fieldName: string;
     createdAt: Date;
     description: string;
+    lat?: number;
+    lng?: number;
 }
 
 export default function useFetchFields() {
