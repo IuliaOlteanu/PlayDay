@@ -56,12 +56,13 @@ const MyProfilePage: React.FC = () => {
     if (newName !== userData?.name) {
       const userRef = doc(firestore, 'users', user!.uid);
       await updateDoc(userRef, { name: newName });
+      setUserData((prevData: any) => ({ ...prevData, name: newName }));
     }
 
     if (imageFile) {
       setUploading(true);
 
-      const storageRef = ref(storage, `profile-pictures/${user!.uid}`);
+      const storageRef = ref(storage, `${user!.uid}`);
       const uploadTask = uploadBytesResumable(storageRef, imageFile);
 
       uploadTask.on(
@@ -75,6 +76,7 @@ const MyProfilePage: React.FC = () => {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
           const userRef = doc(firestore, 'users', user!.uid);
           await updateDoc(userRef, { profilePicture: downloadURL });
+          setUserData((prevData: any) => ({ ...prevData, profilePicture: downloadURL }));
           setUploading(false);
         }
       );
