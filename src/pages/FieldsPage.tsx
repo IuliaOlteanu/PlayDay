@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { firestore } from "@/lib/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import { createRef, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const FieldCard: React.FC<FieldData> = (props) => {
     const { fieldName, location, price } = props;
@@ -22,6 +23,8 @@ const FieldCard: React.FC<FieldData> = (props) => {
     const [endDate, setEndDate] = useState<Date | null>(null);
     const [hours, setHours] = useState<number>(0);
     const [priceToPay, setPriceToPay] = useState<number>(0);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (startDate && endDate) {
@@ -74,11 +77,16 @@ const FieldCard: React.FC<FieldData> = (props) => {
                 hours,
                 owner
         }).then(() => {
-            toast(({
-                title: "Field rented successfully!",
-                description: "You will receive a confirmation email shortly.",
-                variant: "default"
-            }))
+          navigate("/payment", {
+            state: {
+              priceToPay,
+              fieldName,
+              location,
+              startDate,
+              endDate,
+              hours
+            }
+          })
         })
     }
 

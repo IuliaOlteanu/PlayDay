@@ -11,6 +11,8 @@ import MyProfilePage from './pages/MyProfilePage';
 import GamesPage from './pages/GamesPage';
 import { FieldsPage } from './pages/FieldsPage';
 import MyFields from './pages/MyFields';
+import PaymentEmulator from "./pages/PaymentEmulator";
+import { Toaster } from './components/ui/toaster';
 
 function App() {
 
@@ -47,9 +49,14 @@ function App() {
             {/* My Fields Page */}
             <Route path="/my-fields" element={<MyFields />} />
 
+            {/* In Payment Emulator Page */}
+            <Route path="/payment" element={<PaymentEmulator />} />
+
             {/* Fallback for unmatched routes */}
             <Route path="*" element={<InProgressPage />} />
           </Routes>
+
+          <Toaster />
         </AuthProvider>
       </BrowserRouter>
 
