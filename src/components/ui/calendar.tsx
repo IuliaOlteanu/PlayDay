@@ -1,7 +1,5 @@
 import * as React from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker } from "react-day-picker"
-
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
@@ -50,32 +48,6 @@ function Calendar({
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
         ...classNames,
-      }}
-      components={{
-        IconLeft: ({ className, ...props }: { className?: string }) => (
-          <ChevronLeft className={cn("h-4 w-4", className)} {...props} />
-        ),
-        IconRight: ({ className, ...props }: { className?: string }) => (
-          <ChevronRight className={cn("h-4 w-4", className)} {...props} />
-        ),
-        Navigation: ({ previousMonth, nextMonth, ...props }: { previousMonth: Date; nextMonth: Date; onMonthChange: (month: Date) => void }) => (
-          <div className="flex items-center space-x-2">
-            <button
-              type="button"
-              onClick={() => props.onMonthChange(previousMonth)}
-              className={cn("h-4 w-4", buttonVariants({ variant: "outline" }))}
-            >
-              <ChevronLeft />
-            </button>
-            <button
-              type="button"
-              onClick={() => props.onMonthChange(nextMonth)}
-              className={cn("h-4 w-4", buttonVariants({ variant: "outline" }))}
-            >
-              <ChevronRight />
-            </button>
-          </div>
-        ),
       }}
       {...props}
     />
