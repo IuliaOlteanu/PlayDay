@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, firestore, storage } from '../lib/firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { AuthContext } from '../components/context/auth-provider';
 import { FaUser, FaEnvelope, FaCalendarAlt, FaGamepad } from 'react-icons/fa';
+import GameCard, { Game } from '@/components/GameCard';
 
 const MyProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'profile' | 'games' | 'rented'>('profile');
@@ -14,6 +15,7 @@ const MyProfilePage: React.FC = () => {
   const [newName, setNewName] = useState<string>('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [userGames, setUserGames] = useState<Game[]>([]);
 
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
@@ -40,6 +42,21 @@ const MyProfilePage: React.FC = () => {
       .finally(() => {
         setLoading(false);
       });
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const q = query(collection(firestore, "games"), where("joinedPlayers", "array-contains", user.email));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const gamesData = querySnapshot.docs.map((doc) => ({
+        ...(doc.data() as Game),
+        id: doc.id,
+      }));
+      setUserGames(gamesData);
+    });
+
+    return () => unsubscribe();
   }, [user]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -187,16 +204,18 @@ const MyProfilePage: React.FC = () => {
 
         {activeTab === 'games' && (
           <div>
-            <h1 className="text-2xl font-bold text-[#065C64] mb-6">My Games</h1>
-            {/* aici urmează partea cu lista de jocuri */}
-            <p>Games list will be here...</p>
+            <h1 className="text-2xl font-bold text-[#065C64] mb-6 text-center">My Games</h1>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4 w-full max-w-screen-xl mx-auto">
+              {userGames.map((game) => (
+                <GameCard key={game.id} game={game} />
+              ))}
+            </div>
           </div>
         )}
 
         {activeTab === 'rented' && (
           <div>
             <h1 className="text-2xl font-bold text-[#065C64] mb-6">Rented Fields</h1>
-            {/* aici urmează partea cu terenurile închiriate */}
             <p>Rented fields will be here...</p>
           </div>
         )}
