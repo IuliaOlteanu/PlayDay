@@ -19,10 +19,11 @@ export interface Game {
 }
 
 export interface GameCardProps {
-  game: Game;
+  game: Game,
+  isPast?: boolean;
 }
 
-const GameCard: React.FC<GameCardProps> = ({ game }) => {
+const GameCard: React.FC<GameCardProps> = ({ game, isPast }) => {
   const [gameData, setGameData] = useState<Game>(game);
   const [rentalDetails, setRentalDetails] = useState<{
     fieldName: string;
@@ -117,19 +118,22 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
             </span>
           </p>
         </div>
-
         <div className="mt-auto w-full flex justify-center">
-          {isAvailable && isLoggedIn && hasNotJoined ? (
+          {isPast ? (
+            <Button disabled className="w-full bg-red-400 cursor-not-allowed">
+              In the past
+            </Button>
+          ) : isLoggedIn && !hasNotJoined ? (  // user has joined
+            <Button disabled className="w-full">
+              Already joined
+            </Button>
+          ) : isAvailable && isLoggedIn && hasNotJoined ? (
             <Button onClick={handleJoinGame} className="w-full">
               Join Game
             </Button>
           ) : (
             <Button disabled className="w-full">
-              {isLoggedIn
-                ? isAvailable
-                  ? "Already joined"
-                  : "Game full"
-                : "Not available"}
+              {isLoggedIn ? "Game full" : "Not available"}
             </Button>
           )}
         </div>

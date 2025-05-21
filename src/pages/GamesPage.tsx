@@ -44,8 +44,8 @@ function GamesPage() {
         const userGames = querySnapshot.docs.map((doc) => ({
           ...(doc.data() as Game),
           id: doc.id,
-        }));
-        setUserGames(userGames);
+        }));  
+        setUserGames(userGames.filter((game: Game) => new Date(game.date.seconds * 1000) > new Date()));
       });
       if (user) {
         const rentalsRef = collection(firestore, "rentals");
@@ -120,7 +120,6 @@ function GamesPage() {
       alert("Failed to add the game. Please try again.");
     }
   };
-  const isLoggedIn = user !== null;
   const buttonClass =
     "px-8 py-3 bg-[#065C64] text-white text-lg font-medium rounded-full shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:scale-105";
 

@@ -201,29 +201,85 @@ const MyProfilePage: React.FC = () => {
           <div>
             <h1 className="text-2xl font-bold text-[#065C64] mb-6">My Games</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4 w-full max-w-screen-xl mx-auto">
-              {userGames.map((game) => (<GameCard key={game.id} game={game} />))}
+              {[...userGames]
+                .sort((a, b) => {
+                  const now = new Date();
+                  const aDate = a.date.toDate ? a.date.toDate() : new Date(Number(a.date));
+                  const bDate = b.date.toDate ? b.date.toDate() : new Date(Number(b.date));
+
+                  const aPast = aDate < now;
+                  const bPast = bDate < now;
+
+                  if (aPast !== bPast) {
+                    return Number(aPast) - Number(bPast); // future first
+                  }
+                  return aDate.getTime() - bDate.getTime(); // ascending by date within group
+                })
+                .map((game) => {
+                  const gameDate = game.date.toDate ? game.date.toDate() : new Date(Number(game.date));
+                  const isPast = gameDate < new Date();
+
+                  return <GameCard key={game.id} game={game} isPast={isPast} />;
+                })}
             </div>
           </div>
         )}
+
 
         {activeTab === 'rented' && (
           <div>
             <h1 className="text-2xl font-bold text-[#065C64] mb-6">Rented Fields</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4 w-full max-w-screen-xl mx-auto">
-              {rentals.map((rental) => (
-                <div key={rental.id} className="bg-white p-4 rounded shadow-md flex flex-col justify-between">
-                  <div>
-                    <h2 className="text-lg font-semibold mb-2">{rental.fieldName}</h2>
-                    <p className="text-sm text-gray-600">{rental.location}</p>
-                    <p className="text-sm text-gray-600">Price: €{rental.priceToPay}</p>
-                    <p className="text-sm text-gray-600">Date: {rental.startDate.toDate().toLocaleDateString()} at {rental.startDate.toDate().getHours()} for {rental.hours} hours</p>
-                  </div>
-                  <button onClick={() => handleAddGameFromRental(rental)} className="mt-4 px-4 py-2 bg-[#065C64] text-white rounded hover:bg-[#054a50]">Add a Game</button>
-                </div>
-              ))}
+              {[...rentals]
+                .sort((a, b) => {
+                  const now = new Date();
+                  const aDate = a.startDate.toDate();
+                  const bDate = b.startDate.toDate();
+
+                  const aPast = aDate < now;
+                  const bPast = bDate < now;
+
+                  if (aPast !== bPast) {
+                    return Number(aPast) - Number(bPast); // future first
+                  }
+                  return aDate.getTime() - bDate.getTime(); // ascending by date within group
+                })
+                .map((rental) => {
+                  const rentalDate = rental.startDate.toDate();
+                  const isPast = rentalDate < new Date();
+
+                  return (
+                    <div
+                      key={rental.id}
+                      className={isPast ? 'rounded-xl bg-red-100 bg-opacity-40 p-2' : ''}
+                    >
+                      <div className="h-full flex flex-col justify-between border rounded-xl p-4 shadow-sm bg-white">
+                        <div>
+                          <h2 className="text-lg font-semibold mb-2">{rental.fieldName}</h2>
+                          <p className="text-sm text-gray-600">{rental.location}</p>
+                          <p className="text-sm text-gray-600">Price: €{rental.priceToPay}</p>
+                          <p className="text-sm text-gray-600">
+                            Date: {rentalDate.toLocaleDateString()} at {rentalDate.getHours()} for {rental.hours} hours
+                          </p>
+                        </div>
+                        <button
+                          disabled={isPast}
+                          onClick={() => handleAddGameFromRental(rental)}
+                          className={`mt-4 px-4 py-2 rounded text-white font-medium transition ${
+                            isPast ? 'bg-red-400 cursor-not-allowed' : 'bg-[#065C64] hover:bg-[#054a50]'
+                          }`}
+                        >
+                          {isPast ? 'In the past' : 'Add a Game'}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         )}
+
+
 
         {showAddGameModal && selectedRental && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
