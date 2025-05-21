@@ -7,7 +7,7 @@ import { AuthContext } from "@/components/context/auth-provider";
 import { Timestamp } from "firebase/firestore";
 
 
-interface Rental {
+export interface Rental {
     id: string;
     endDate: Timestamp;
     fieldName: string;
